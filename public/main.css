@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,600;1,700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto Mono', monospace;
+}
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 10px;
+    width: 100%;
+    background-color: #5890AB;
+    height: 70px;
+    color: white;
+    font-size: 0.6rem;
+    position: fixed;
+    top: 0;
+}
+.input-box-wrapper{
+    /* width: 100%; */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 100px 20px 20px; 
+    flex-direction: column;
+}
+.input-box-wrapper input{
+    padding: 8px;
+    font-size: 1rem;
+    width: 40%;
+    font-weight: bold;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border:1px solid grey;
+
+}
+.input-box-wrapper button {
+    padding: 4px 8px;
+    font: bold;
+    font-size: 1rem;
+    border-radius: 8px;
+    background-color: limegreen;
+    color:white;
+}
+.table-wrapper{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-self: flex-start;
+}
+.number-table{
+    width: 80%;
+    margin: auto;
+    margin: 20px 0px;
+    align-self: center;
+   
+}
+.number-table,td,tr{
+    /* border-collapse: collapse; */
+    border: 1px solid black;
+    padding: 4px 8px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+tr:nth-child(even) {
+    background-color: #D6EEEE;
+}
+
+
+

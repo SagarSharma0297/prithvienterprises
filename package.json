@@ -1,0 +1,19 @@
+{
+  "name": "vehicle_info_project",
+  "version": "1.0.0",
+  "description": "We can find details of any vehicle.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NA",
+    "start": "nodemon index.js"
+  },
+  "author": "Sagar Sharma",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15"
+  }
+}
