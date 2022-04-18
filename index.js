@@ -19,49 +19,69 @@ app.use(express.static(__dirname + '/public'));
 // })
 
 
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
 	host:"bgubididdk0qtmvnlqpf-mysql.services.clever-cloud.com",
 	user:"ugdyn620pbgoihzr",
 	password:"DFQxqRCp1e1J0jZfzwlN",
 	database : "bgubididdk0qtmvnlqpf",
 })
 
-connection.connect(function(err) {
-	if(err){
-	console.log("Error in the connection")
-	console.log(err)
-	}
-	else{
-	console.log(`Database Connected`)
-	connection.query(`SHOW DATABASES`,
-	function (err, result) {
-		if(err)
-		console.log(`Error executing the query - ${err}`)
-		else
-		console.log("Result: ",result)
-	})
-	}
-})
+// connection.connect(function(err) {
+// 	if(err){
+// 	console.log("Error in the connection")
+// 	console.log(err)
+// 	}
+// 	else{
+// 	console.log(`Database Connected`)
+// 	connection.query(`SHOW DATABASES`,
+// 	function (err, result) {
+// 		if(err)
+// 		console.log(`Error executing the query - ${err}`)
+// 		else
+// 		console.log("Result: ",result)
+// 	})
+// 	}
+// })
 
 
 app.post('/api/login',(req,res) => {
-    console.log(req.body)
+    console.log(req.body.username)
     connection.query(`select * from users where username = '${req.body.username}'`,(err,result) => {
         if(err){
             console.log(err)
-            res.statusCode(400)
-            res.statusMessage('Bad Request')
+            res.statusCode = 400;
+            res.statusMessage ='Bad Request';
+            res.json({
+                status:"failed",
+                message:err,
+            })
         }
         else {
            if(result.length === 0){
                res.statusCode = 404;
                res.statusMessage = "User Not Found";
-               res.send();
+               res.json({
+                   status:"failed",
+                   message:"user not found"
+               });
            }
            else {
-               res.statusCode = 200;
-               res.statusMessage = "User Found";
-               res.send(result[0].role);
+               if(req.body.password === result[0].password){
+                res.statusCode = 200;
+                res.statusMessage = "User Found";
+                res.json({
+                    status:"success",
+                    role:result[0].role
+                });
+               } else{
+                res.statusCode = 401;
+                res.statusMessage = "Password not match";
+                res.json({
+                    status:"failed",
+                    message:"Password Not Match"
+                })
+
+               }
            }
         }
     })
