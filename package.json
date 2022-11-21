@@ -5,14 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "NA",
-    "start": "nodemon index.js"
+    "start": "node --max_old_space_size=5120  index.js",
+    "heroku": "node --max_old_space_size=5120  index.js"
+  },
+  "config": {
+    "node-options": "--max_old_space_size=5120"
   },
   "author": "Sagar Sharma",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.2",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.17.3",
+    "mongoose": "^6.4.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15"
   }

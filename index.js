@@ -1,177 +1,270 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT||9000;
+const port = process.env.PORT || 9000;
 var bodyParser = require('body-parser');
 var path = require('path');
-const URL = "mongodb+srv://SAGAR_VASHISTHA:72zqqEgfaRpddPh5@cluster0.eubhu.mongodb.net/maskoTMS?retryWrites=true&w=majority";
+const URL = "mongodb+srv://SAGAR_VASHISTHA:2oZScyMYdtU7tqvZ@cluster0.eubhu.mongodb.net/PrithviEnterPrises?retryWrites=true&w=majority";
 const cors = require('cors');
 var mysql = require('mysql');
+const mongoose = require('mongoose');
+const Vehicle = require('./modals/vehicleSchema');
+const Infinity = require('./modals/infinityScema');
+const Users = require('./modals/userSchema');
 
-app.use(bodyParser());
-app.use(cors());
-app.use(express.static(__dirname + '/public'));
-
-// var connection = mysql.createConnection({
-// 	host:"localhost",
-// 	user:"root",
-// 	password:"Vashistha@0297",
-// 	database : "vehicledb",
-// })
-
-
-var connection = mysql.createPool({
-	host:"bgubididdk0qtmvnlqpf-mysql.services.clever-cloud.com",
-	user:"ugdyn620pbgoihzr",
-	password:"DFQxqRCp1e1J0jZfzwlN",
-	database : "bgubididdk0qtmvnlqpf",
-})
-
-// connection.connect(function(err) {
-// 	if(err){
-// 	console.log("Error in the connection")
-// 	console.log(err)
-// 	}
-// 	else{
-// 	console.log(`Database Connected`)
-// 	connection.query(`SHOW DATABASES`,
-// 	function (err, result) {
-// 		if(err)
-// 		console.log(`Error executing the query - ${err}`)
-// 		else
-// 		console.log("Result: ",result)
-// 	})
-// 	}
-// })
-
-
-app.post('/api/login',(req,res) => {
-    console.log(req.body.username)
-    connection.query(`select * from users where username = '${req.body.username}'`,(err,result) => {
-        if(err){
-            console.log(err)
-            res.statusCode = 400;
-            res.statusMessage ='Bad Request';
-            res.json({
-                status:"failed",
-                message:err,
-            })
-        }
-        else {
-           if(result.length === 0){
-               res.statusCode = 404;
-               res.statusMessage = "User Not Found";
-               res.json({
-                   status:"failed",
-                   message:"user not found"
-               });
-           }
-           else {
-               if(req.body.password === result[0].password){
-                res.statusCode = 200;
-                res.statusMessage = "User Found";
-                res.json({
-                    status:"success",
-                    role:result[0].role
-                });
-               } else{
-                res.statusCode = 401;
-                res.statusMessage = "Password not match";
-                res.json({
-                    status:"failed",
-                    message:"Password Not Match"
-                })
-
-               }
-           }
-        }
-    })
-});
-
-
-app.use('/api/getdata',(req,res) => {
-    connection.query(`select * from vehiclelist`,(err,result) => {
-        if(err){
-            console.log(err)
-        }
-        else {
-            res.send(result)
-        }
-    })
-});
-
-app.use('/api/getdetaildata',(req,res) => {
-    console.log(req.query)
-    connection.query(`select * from vehiclelist where registration like '%${req.query.searchvalue}%'`,(err,result) => {
-        if(err){
-            console.log(err)
-        }
-        else {
-            res.send(result)
-        }
-    })
-});
-
-app.get('/',(req,res)=>{
-    res.sendFile(path.join(__dirname+'/public/login.html'),(err)=>{
-        if(err) {
-            console.log(err)
-        }
-    })
-});
-
-app.get('/main',(req,res)=>{
-    res.sendFile(path.join(__dirname+'/public/main.html'),(err)=>{
-        if(err) {
-            console.log(err)
-        }
-    })
-});
-
-app.get('/detailpage',(req,res)=>{
-    res.sendFile(path.join(__dirname+'/public/detailpage.html'),(err)=>{
-        if(err) {
-            console.log(err)
-        }
-    })
-});
-
-app.get('/api/getvaluebylan',(req,res)=>{
-    console.log(req.query.role);
-    // res.send(req.query)
-    // res.sendFile(path.join(__dirname+'/public/detailpage.html'),(err)=>{
-    //     if(err) {
-    //         console.log(err)
-    //     }
-    // })
-    if(req.query.role == "admin"){
-        connection.query(`select * from vehiclelist where LAN = '${req.query.searchVal}'`,(err,result) => {
-            if(err){
-                console.log(err)
-            }
-            else {
-                    res.send(result)
-            }
-        })
-    }
-    else {
-        connection.query(`select LAN,CUSTOMER_NAME,REGISTRATION,ASSET_MODEL,VIN,ENGINE from vehiclelist where LAN = '${req.query.searchVal}'`,(err,result) => {
-            if(err){
-                console.log(err)
-            }
-            else {
-                    res.send(result)
-            }
-        })
-    }
-   
-});
-
-
-
-app.listen(port,(err)=>{
-    if(err){
+mongoose.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+    if (err) {
         console.log(err)
     } else {
-        console.log(`TMS server is running at port ${port}`);
+        console.log("Connected To MongoDB")
+    }
+});
+
+app.use(cors());
+app.use(bodyParser.json({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/', (req, res) => {
+    res.send('Hello')
+    console.log('hello')
+})
+
+app.delete('/api/deleteUser',(req,res) => {
+  
+    const {id} = req.body;
+
+    try{
+        Users.findByIdAndDelete(id ,(err,result)=>{
+            if(err){
+                res.json({
+                    status: 417,
+                    message: "Failure",
+                    data: {}
+                })
+                console.log(err)
+            }else{
+                res.json({
+                    status: 204,
+                    message: "User Deleted",
+                    data: result
+                })
+                console.log(result)
+            }
+
+        })
+    }catch(err){
+        res.json({
+            status: 500,
+            message: "Error",
+            data: {},
+        })
+        console.log(err)
+    }
+})
+
+app.post('/api/createNewUser',async(req,res) => {
+    const {username,password,firstName,lastName} =  req.body;
+    console.log(username,password,firstName,lastName)
+    try{
+        Users.create({createdAt:new Date(),"username":username,"password":password,"role":"user","firstName":firstName,"lastName":lastName,"identifier":"first"},(err,result) => {
+            if(err){
+                console.log('there is some error',err)
+                res.statusCode = 417;
+                res.statusMessage = "Something went wrong";
+                res.json({
+                    status: 417,
+                    message: "Failure",
+                    data: {}
+                })
+
+            }else{
+                console.log(result)
+                res.statusCode = 417;
+                res.statusMessage = "User Created";
+                res.json({
+                    status: 201,
+                    message: "User created",
+                    data: result,
+                })
+            }
+        })
+    }catch(error){
+        console.log(error)
+        res.json({
+            status: 500,
+            message: "Error",
+            data: {},
+        })
+    }
+})
+
+app.get('/api/getUsersList', async (req,res) => {
+    try{
+        const users = await Users.find();
+            if(!users){
+                console.log('Get User List Api fails')
+            }else{
+                console.log('this is the result',users)
+                res.status = 200;
+                res.statusMessage = "User List Fetched";
+                // res.header({"report":"ok"})
+                // res.writeHead({
+                //     Accept: 'application/json',
+                //     'Content-Type': 'application/json'
+                // })
+                res.json({
+                    status: 200,
+                    message: "success",
+                    data: users,
+                })
+            }
+        }catch(error){
+        res.status = 500;
+        res.json({
+            status: 500,
+            message: "Server Error",
+            data:[],
+        })
+    }
+
+});
+
+app.post('/api/login', async (req, res) => {
+    // console.log(req.body.username)
+    const { username, password ,androidId} = req.body;
+    if(!androidId){
+
+        res.statusCode = 404;
+        res.statusMessage = "Please Update Your App";
+        res.json({
+            status: "failed",
+            message: "Please Update Your App"
+        })
+        return;
+
+    }
+    console.log(androidId)
+    const user = await Users.findOne({ username }).lean();
+    console.log(user)
+
+    if (!user) {
+        res.statusCode = 404;
+        res.statusMessage = "User Not Found";
+        res.json({
+            status: "failed",
+            message: "user not found"
+        })
+    }
+    else if (user.password === password) {
+        if(user.identifier === 'first'){
+            res.statusCode = 200;
+            res.statusMessage = "User Found";
+            res.json({
+                status: "success",
+                role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                userName: user.userName,
+            });
+            const result = Users.findByIdAndUpdate(user._id,{identifier:androidId},(err,res)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    console.log(res)
+                }
+            })
+        } else if(user.identifier === androidId) {
+            res.statusCode = 200;
+            res.statusMessage = "User Found";
+            res.json({
+                status: "success",
+                role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                userName: user.userName,
+            });
+        } else{
+
+            res.statusCode = 401;
+            res.statusMessage = "already login on other device";
+            res.json({
+                status: "failed",
+                message: "Already Login On Other Device",
+            })
+
+        }
+        // res.statusCode = 200;
+        // res.statusMessage = "User Found";
+        // res.json({
+        //     status: "success",
+        //     role: user.role,
+        //     firstName: user.firstName,
+        //     lastName: user.lastName,
+        //     userName: user.userName,
+        // });
+    } else {
+        res.statusCode = 401;
+        res.statusMessage = "Password not match";
+        res.json({
+            status: "failed",
+            message: "Password Not Match",
+        })
+    }
+});
+
+// app.post('/api/getVehicleData', async (req, res) => {
+//     const vehicles = await Vehicle.find({registration_number:{$regex:req.body.value}}).sort({registration_number:1});
+//     res.json({
+//         status: 200,
+//         message: "success",
+//         data: vehicles,
+//     })
+// });
+
+
+app.post('/api/getInfinityData', async (req, res) => {
+    try{
+        const infinityData = await Infinity.find({registration_number:{$regex:req.body.value}}).sort({registration_number:1});
+            if(!infinityData){
+                res.statusCode = 417;
+                res.statusMessage= "Failure";
+                res.json({
+                    status: 417,
+                    message: "Failure",
+                    data:[],
+                })
+            }else{
+                res.statusCode = 200;
+                res.statusMessage= "Success";
+                res.json({
+                    status: 200,
+                    message: "success",
+                    data: infinityData,
+                })
+            }
+      
+        // console.log(infinityData)
+        // res.json({
+        //     status: 200,
+        //     message: "success",
+        //     data: infinityData,
+        // })
+    }
+    catch(error){
+        res.statusCode = 500;
+        res.statusMessage = "Server Error"
+        res.json({
+            status: 500,
+            message: "Server Error",
+            data:[],
+        })
+    }
+});
+
+
+app.listen(port, (err) => {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(`PE server is running at port ${port}`);
     }
 });
