@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 9000;
+const port = process.env.PORT || 80;
 var bodyParser = require('body-parser');
 var path = require('path');
 const URL = "mongodb+srv://SAGAR_VASHISTHA:2oZScyMYdtU7tqvZ@cluster0.eubhu.mongodb.net/PrithviEnterPrises?retryWrites=true&w=majority";
