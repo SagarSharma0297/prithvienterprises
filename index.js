@@ -260,6 +260,45 @@ app.post('/api/getInfinityData', async (req, res) => {
     }
 });
 
+app.post('/api/getDataViaChasis', async (req, res) => {
+    try{
+        const infinityData = await Infinity.find({chasis_number:{$regex:req.body.value}}).sort({registration_number:1});
+            if(!infinityData){
+                res.statusCode = 417;
+                res.statusMessage= "Failure";
+                res.json({
+                    status: 417,
+                    message: "Failure",
+                    data:[],
+                })
+            }else{
+                res.statusCode = 200;
+                res.statusMessage= "Success";
+                res.json({
+                    status: 200,
+                    message: "success",
+                    data: infinityData,
+                })
+            }
+      
+        // console.log(infinityData)
+        // res.json({
+        //     status: 200,
+        //     message: "success",
+        //     data: infinityData,
+        // })
+    }
+    catch(error){
+        res.statusCode = 500;
+        res.statusMessage = "Server Error"
+        res.json({
+            status: 500,
+            message: "Server Error",
+            data:[],
+        })
+    }
+});
+
 
 app.listen(port, (err) => {
     if (err) {
