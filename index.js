@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const Vehicle = require('./modals/vehicleSchema');
 const Infinity = require('./modals/infinityScema');
 const Users = require('./modals/userSchema');
-
+mongoose.set('strictQuery', true);
 mongoose.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     if (err) {
         console.log(err)
